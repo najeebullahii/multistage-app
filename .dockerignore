@@ -1,0 +1,24 @@
+# Git
+.git
+.gitignore
+
+# Dependencies
+node_modules
+
+# Build output
+dist
+build
+
+# Tests
+*.test.js
+__tests__
+
+# Docs
+*.md
+DOCS
+
+# CI
+.github
+
+# Environment
+.env*

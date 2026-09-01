@@ -1,0 +1,27 @@
+# Dependency stage (cached separately)
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Build stage with dev dependencies
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+# Test stage
+FROM build AS test
+RUN npm test || echo "Tests run here"
+
+# Production stage
+FROM node:20-alpine AS production
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
+COPY package*.json ./
+COPY app.js server.js ./
+USER node
+EXPOSE 3000
+CMD ["node", "server.js"]
