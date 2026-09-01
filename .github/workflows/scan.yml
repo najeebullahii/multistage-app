@@ -1,0 +1,28 @@
+name: Build and Scan
+
+on: push
+
+jobs:
+  build-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        target: production
+        load: true
+        tags: multistage-app:scan
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'multistage-app:scan'
+        format: 'table'
+        exit-code: '1'
+        severity: 'CRITICAL,HIGH'
